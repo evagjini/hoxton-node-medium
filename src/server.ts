@@ -21,6 +21,20 @@ app.get('/users', async (req,res)=>{
         res.status(400).send({error:error.message})
     }
 })
+
+// Get a specific user
+
+
+app.get('/users/:id', async(req, res)=>{
+    try{
+        const userId = Number(req.params.id)
+        const user = await prisma.user.findUnique({where:{id:userId}, include:{blogs:true}})
+        res.send(user)
+    } catch (error){
+        // @ts-ignore
+        res.status(404).send({error:error.message})
+    }
+})
 //  Get All Blogs
 app.get("/blogs", async (req, res) => {
   try {
@@ -35,8 +49,9 @@ app.get("/blogs", async (req, res) => {
 });
 //  Get a Specific  Post
 app.get("/blogs/:id", async (req, res) => {
-  const id = Number(req.params.id);
+  
   try {
+    const id = Number(req.params.id);
     const blog = await prisma.blog.findUnique({
       where: { id },
       include: { user: true, likes: true, responds: true },
@@ -47,8 +62,8 @@ app.get("/blogs/:id", async (req, res) => {
       res.status(404).send({ error: "Blog not Found!" });
     }
   } catch (error) {
-    //  @ts-node
-    res.status(400).send({ error: "blog not Found!" });
+    //  @ts-ignore
+    res.status(400).send({ error: error.message });
   }
 });
 //  Create  a Post
@@ -73,6 +88,7 @@ app.delete("/blogs/:id", async (req, res) => {
     });
     res.send(blog);
   } catch (error) {
+    // @ts-ignore
     res.status(400).send({ error: error });
   }
 });
