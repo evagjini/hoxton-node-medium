@@ -8,6 +8,19 @@ app.use(express.json());
 const prisma = new PrismaClient();
 const port = 5136;
 
+
+
+// get All users 
+
+app.get('/users', async (req,res)=>{
+    try{
+        const users = await prisma.user.findMany({include:{blogs:true}})
+       res.send(users)
+    } catch (error){
+        // @ts-ignore
+        res.status(400).send({error:error.message})
+    }
+})
 //  Get All Blogs
 app.get("/blogs", async (req, res) => {
   try {
@@ -49,6 +62,7 @@ app.post("/blogs", async (req, res) => {
   }
 });
 
+
 //  delete a Blog
 
 app.delete("/blogs/:id", async (req, res) => {
@@ -62,6 +76,72 @@ app.delete("/blogs/:id", async (req, res) => {
     res.status(400).send({ error: error });
   }
 });
+
+
+// app.patch('/addCommentToBlog', async (req, res) => {
+//     const blogId = Number(req.body.blogId)
+//     // const commentId = Number(req.body.commentId)
+//     const comment = req.body.comment
+  
+//     const blog = await prisma.blog.update({
+//       where: { id:blogId },
+//       data: {
+//         responds: {
+//             // @ts-ignore
+//           create:{
+//             comment :  comment 
+//           }
+//         },user:{connect:{id: userId}}
+//       },
+//       include: {
+//         responds: true
+//       }
+//     })
+  
+//     res.send(blog)
+//   })
+app.get('/responds', async (req,res)=>{
+    try{
+        const comment = await prisma.responds.findMany({include:{blog:true, user:true}})
+    res.send(comment)
+    } catch (error){
+        // @ts-ignore
+        res.status(404).send({error:error.message})
+    }
+})
+// create new Comment 
+app.post('/responds', async (req,res)=>{
+    try{
+        const comment = await prisma.responds.create({data:req.body})
+    res.send(comment)
+    } catch (error){
+        // @ts-ignore
+        res.status(404).send({error:error.message})
+    }
+})
+
+// app.post('/responds', async (req,res)=>{
+//     const commentData = {
+//         comment :req.body.comment,
+//         user:req.body.userId,
+//         blog:
+//     }
+// })
+
+// app.post ('/likes', async (req,res)=>{
+//     const likes = {
+//         blogId : req.body.blogId
+//     }
+//     try{
+//         const likeABlog = await prisma.likes.create({
+//             data:{
+//                 blogId:likes.blogId
+//             },
+//             include:{blog:true}
+//         })
+//         res.send(likeABlog)
+//     }
+// })
 
 app.listen(port, () => {
   console.log(`App is running: http://localhost:${port}`);
