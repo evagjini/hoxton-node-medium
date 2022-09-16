@@ -34,6 +34,7 @@ model Blog {
 
 model Likes {
   id     Int  @id @default(autoincrement())
+  liked  Int  @default(0)
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   blog   Blog @relation(fields: [blogId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId Int
